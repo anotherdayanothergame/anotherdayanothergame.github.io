@@ -1,23 +1,780 @@
 <html>
+
 <head>
+
+
 
 <title>WizFight</title>
 
-<style>
-</style>
+<link id='favicon' rel='icon' type='image/png' href='img/wiz/chaoswiz.png'>
+
+
+
+<script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+
+<script type="text/javascript" src="https://wizfight.tumblr.com/api/read/json?num=40"></script>
+
+
 
 <script type="text/javascript">
 
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-38159815-1']);
-  _gaq.push(['_trackPageview']);
+var postPos = 0;
 
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
+
+
+$(document).ready(function() {
+
+	var images = ['bg1', 'bg2', 'bg3', 'bg4'];
+
+	$('body').css({'background-image': 'url(img/bg/' + images[Math.floor(Math.random() * images.length)] + '.png)'});
+
+
+
+	$('.menu>li').hover(function() {
+
+		$(this).css('text-decoration', 'underline');
+
+	}, function(e) {
+
+		$(this).css('text-decoration', 'none');
+
+	});
+
+
+
+	$('.clickable').hover(function() {
+
+		$(this).css('text-decoration', 'underline');
+
+	}, function(e) {
+
+		$(this).css('text-decoration', 'none');
+
+	});
+
+
+
+	$('#older').on('click',function(e){
+
+		changePosts(true, false);
+
+		checkVisibility();
+
+	});
+
+
+
+	$('#newer').on('click',function(e){
+
+		changePosts(true, true);
+
+		checkVisibility();
+
+	});
+
+
+
+	$('.menu>li').on('click',function(e){
+
+		$('.content').fadeOut(0, function() {
+
+			$('.content').fadeIn();
+
+		});
+
+	    $('.content>.'+ e.target.classList[0]).show().siblings().hide();
+
+	    $("div#content").css("height", $('.content>.' + e.target.classList[0]));
+
+	});
+
+
+
+	var screens = ['ice_level', 'temple_level', 'tower_level'];
+
+	$('#features').on('click', function(e){
+
+		$('#randscreen').attr('src', 'img/screenshot/' + screens[Math.floor(Math.random() * screens.length)] + '.png');
+
+	});
+
+
+
+	var wiz = ['bacon', 'banana', 'chaos', 'egg', 'generic', 'gold', 'ice', 'invisi', 'laser', 'lightning', 'love', 'mushroom', 'naked', 'potato', 'rainbow', 'sun', 'thief', 'zen'];
+
+	$('#wiz1').attr('src', 'img/wiz/' + wiz[Math.floor(Math.random() * wiz.length)] + 'wiz.png');
+
+	$('#wiz2').attr('src', 'img/wiz/' + wiz[Math.floor(Math.random() * wiz.length)] + 'wiz.png');
+
+	$('#favicon').attr('href', 'img/wiz/' + wiz[Math.floor(Math.random() * wiz.length)] + 'wiz.png');
+
+
+
+	var pg = getQueryVariable("page");
+
+	if (pg) {
+
+		 $('.content>.'+ pg).show().siblings().hide();
+
+		 $("div#content").css("height", $('.content>.' + pg));
+
+		 if (pg === "features") { $('#randscreen').attr('src', 'img/screenshot/' + screens[Math.floor(Math.random() * screens.length)] + '.png'); }
+
+	}
+
+
+
+	changePosts(null, true);
+
+	checkVisibility();
+
+});
+
+
+
+function getQueryVariable(variable)
+
+{
+
+       var query = window.location.search.substring(1);
+
+       var vars = query.split("&");
+
+       for (var i=0;i<vars.length;i++) {
+
+               var pair = vars[i].split("=");
+
+               if(pair[0] == variable){return pair[1];}
+
+       }
+
+       return(false);
+
+}
+
+
+
+function checkVisibility() {
+
+	if (postPos + 10 < tumblr_api_read['posts'].length) {
+
+		$('#older').show();
+
+	} else {
+
+		$('#older').hide();
+
+	}
+
+
+
+	if (postPos > 0) {
+
+		$('#newer').show();
+
+	} else {
+
+		$('#newer').hide();
+
+	}
+
+}
+
+
+
+function changePosts(older, reset)
+
+{
+
+	var pos = 0;
+
+	if (older) {
+
+		if (postPos + 10 < tumblr_api_read['posts'].length) {
+
+			postPos += 10;
+
+		}
+
+	} else {
+
+		if (postPos > 0) {
+
+			postPos -= 10;
+
+		}
+
+	}
+
+
+
+	if (reset) {
+
+		postPos = 0;
+
+	}
+
+
+
+	var iter = 10;
+
+
+
+	if (tumblr_api_read['posts'].length < 10) {
+
+		iter = tumblr_api_read['posts'].length;
+
+	}
+
+
+
+	if (postPos + 10 > tumblr_api_read['posts'].length) {
+
+		iter = tumblr_api_read['posts'].length - postPos;
+
+	}
+
+
+
+	pos = postPos;
+
+
+
+	var postString = "";
+
+	for (i = 0; i < iter; i++)
+
+	{
+
+		if (tumblr_api_read['posts'][i + pos]['type'] != null) {
+
+			if (tumblr_api_read['posts'][i + pos]['type'] === "video") {
+
+				postString = postString + "<a href='" + tumblr_api_read['posts'][i + pos]['url'] + "'><h3>" + tumblr_api_read['posts'][i + pos]['video-caption'] + "</h3></a>" + tumblr_api_read['posts'][i + pos]['video-player'];
+
+				if (i != 9 && i + pos < tumblr_api_read['posts'].length - 1) {
+
+					postString = postString + "<br /><hr><br />";
+
+				}
+
+			}
+
+
+
+			if (tumblr_api_read['posts'][i + pos]['type'] === "photo") {
+
+					postString = postString + "<a href='" + tumblr_api_read['posts'][i + pos]['url'] + "'><h3>" + tumblr_api_read['posts'][i + pos]['photo-caption'] + "</h3></a>" + tumblr_api_read['posts'][i + pos]['photo-player'];
+
+				if (i != 9 && i + pos < tumblr_api_read['posts'].length - 1) {
+
+					postString = postString + "<br /><hr><br />";
+
+				}
+
+			}
+
+
+
+			if (tumblr_api_read['posts'][i + pos]['type'] === "regular") {
+
+				postString = postString + "<a href='" + tumblr_api_read['posts'][i + pos]['url'] + "'><h3>" + tumblr_api_read['posts'][i + pos]['regular-title'] + "</h3></a>" + tumblr_api_read['posts'][i + pos]['regular-body'];
+
+				if (i != 9 && i + pos < tumblr_api_read['posts'].length - 1) {
+
+					postString = postString + "<br /><hr><br />";
+
+				}
+
+			}
+
+		}
+
+	}
+
+
+
+	$('#blog').html(postString);
+
+}
 
 </script>
+
+
+
+<style>
+
+
+
+@font-face
+
+{
+
+	font-family : Dretch;
+
+	src : url(img/font/Dretch.otf);
+
+}
+
+
+
+a:link
+
+{
+
+	color : white;
+
+}
+
+
+
+a:hover
+
+{
+
+	color : white;
+
+}
+
+
+
+a:visited
+
+{
+
+	color : white;
+
+}
+
+
+
+a:active
+
+{
+
+	color : white;
+
+}
+
+
+
+body
+
+{
+
+	background-attachment : fixed;
+
+	background-repeat : no-repeat;
+
+	background-position : center top;
+
+}
+
+
+
+hr
+
+{
+
+    border: 0;
+
+    height: 2px;
+
+    background-image : -webkit-linear-gradient(left, rgba(255,255,255,0), rgba(255,255,255,0.75), rgba(255,255,255,0));
+
+    background-image :    -moz-linear-gradient(left, rgba(255,255,255,0), rgba(255,255,255,0.75), rgba(255,255,255,0));
+
+    background-image :     -ms-linear-gradient(left, rgba(255,255,255,0), rgba(255,255,255,0.75), rgba(255,255,255,0));
+
+    background-image :      -o-linear-gradient(left, rgba(255,255,255,0), rgba(255,255,255,0.75), rgba(255,255,255,0));
+
+}
+
+
+
+.clickable
+
+{
+
+	cursor : pointer;
+
+	font-size : 20;
+
+}
+
+
+
+span
+
+{
+
+	background-color : rgba(255,255,255,0.5);
+
+	-moz-border-radius : 3px;
+
+	-webkit-border-radius : 3px;
+
+	border-radius : 3px;
+
+	padding-left : 10px;
+
+	padding-right : 10px;
+
+	text-shadow : 1px 1px 1px black;
+
+}
+
+
+
+.content
+
+{
+
+	display : block;
+
+	margin-left : auto;
+
+	margin-right : auto;
+
+	width : 800px;
+
+	background-color : rgba(0, 0, 0, 0.75);
+
+	color : rgba(255, 255, 255, 1);
+
+}
+
+
+
+.content > div
+
+{
+
+	display : none;
+
+	margin-left : 20px;
+
+	margin-right : 20px;
+
+	font-family : Dretch;
+
+	font-size : 20;
+
+	padding : 20px 0;
+
+	text-shadow : 1px 1px 1px black;
+
+}
+
+
+
+.content > div:first-child
+
+{
+
+	display : block;
+
+}
+
+
+
+h2, p
+
+{
+
+	padding:0;
+
+	margin:0;
+
+}
+
+
+
+.menu
+
+{
+
+	display : block;
+
+	margin-left : auto;
+
+	margin-right : auto;
+
+	margin-top : 1cm;
+
+	margin-bottom : 0.5cm;
+
+	width : 1000px;
+
+	text-align : center;
+
+	font-family : Dretch;
+
+	font-size : 35;
+
+	color : white;
+
+	text-shadow : 3px 3px 2px black;
+
+}
+
+
+
+.menu > li
+
+{
+
+	display : inline-block;
+
+	cursor : pointer;
+
+}
+
+
+
+td
+
+{
+
+	margin-left : 10px;
+
+	margin-right : 10px;
+
+	margin-top : 0.25cm;
+
+	margin-bottom: 0.25cm;
+
+	font-family : Dretch;
+
+	font-size : 20;
+
+	color : white;
+
+	text-shadow : 1px 1px 1px black;
+
+}
+
+
+
+.center
+
+{
+
+	margin-left : auto;
+
+	margin-right : auto;
+
+}
+
+
+
+.centered
+
+{
+
+	display : block;
+
+	margin-left : auto;
+
+	margin-right : auto;
+
+}
+
+
+
+.flipped
+
+{
+
+	-moz-transform: scaleX(-1);
+
+    -o-transform: scaleX(-1);
+
+    -webkit-transform: scaleX(-1);
+
+    transform: scaleX(-1);
+
+    filter: FlipH;
+
+    -ms-filter: "FlipH";
+
+}
+
+
+
+.contenttext
+
+{
+
+	margin : 20px 10px 20px 10px;
+
+}
+
+
+
+</style>
+
+
+
 </head>
+
 <body>
+
+
+
+<img class="centered" src="img/logo.png" />
+
+
+
+<div class="menu">
+
+	<img id="wiz1" src="" />
+
+	<li class="home">Home</li> |
+
+	<li class="features" id="features">Features</li> |
+
+	<li class="download">Download</li> |
+
+	<li class="team">The Team</li> |
+
+	<li class="devlog">Devlog</li>
+
+	<img id="wiz2" class="flipped" src="" />
+
+</div>
+
+
+
+<div class="content">
+
+	<div class="home">
+
+		<iframe class="centered" width="640" height="480" src="//www.youtube.com/embed/_K2f6211zt4" frameborder="0" allowfullscreen></iframe>
+
+		<br />
+
+		<p>WizFight is a local multiplayer game about dueling wizards for 2-4 players. It is a game about not caring that all you can do is throw banana peels at people while that other guy can draw lightning bolts from the sky.</p>
+
+	</div>
+
+
+
+	<div class="features">
+
+		<p>WizFight is free and open source software, but the latest build, which introduces new content, is only available on Windows unless you compile it from source.</p>
+
+		<br />
+
+		<p>Features:</p>
+
+		<ul>
+
+			<li>Thrilling high-speed deathmatch gameplay.</li>
+
+			<li>Over 35 unique wizards, each with their own power. Some are badass while others are hilarious.</li>
+
+			<li>Four different gameplay modes with more on the way.</li>
+
+			<li>Eight arenas.</li>
+
+			<li>Xbox 360 controller support.</li>
+
+			<li>Support for custom levels, each with their own tilesets, music, and trap placement.</li>
+
+			<li>A single-player/co-op mode.</li>
+
+			<li>Moddable monsters for the aforementioned single-player/co-op mode.</li>
+
+		</ul>
+
+
+
+		<img class="centered" id="randscreen" src="" />
+
+	</div>
+
+
+
+	<div class="download" align="center">
+
+		<p>WizFight is currently available to download exclusively through <a href="http://itch.io">itch.io</a>.</p>
+
+		<br />
+
+		<iframe src="//itch.io/embed/316" width="552" height="167" frameborder="0"></iframe>
+
+		<br />
+
+		<br />
+
+		<p>Those who are interested can download the full Haxe source code via <a href="https://github.com/mattchuranu/wizfight">GitHub</a>.</p>
+
+	</div>
+
+
+
+	<div class="team">
+
+		<table>
+
+			<tr>
+
+				<td align="center"><img src="img/team/Matt.png" /></td>
+
+				<td>Matt has been a gamer for all his life. He tried programming unsuccesfully many times throughout his early teens. One day, he decided to pick up GameMaker and enter a game jam for the hell of it. He has been programming ever since and started WizFight as an attempt to bring at least one more game that really encapsulates the local multiplayer experience into the world.<br /><br /><a href="https://twitter.com/mattchuranu">Follow Matt on Twitter</a>.</td>
+
+			</tr>
+
+		</table>
+
+		<table>
+
+			<tr>
+
+				<td>Kat is WizFight's artist. She has always been interested in both art and video games from an early age so, when given the chance to work on WizFight, she quickly stepped up to the challenge.<br /><br /><a href="https://twitter.com/katarinaklick">Follow Kat on Twitter</a>.</td>
+
+				<td align="center"><img src="img/team/Kat.png" /></td>
+
+			</tr>
+
+		</table>
+
+		<p align="center">Music by <a href="http://jordanoakley.com">Jordan Oakley</a>. <a href="https://twitter.com/Jordanoakley94">Follow Jordan on Twitter</a>.</p>
+
+	</div>
+
+
+
+	<div class="devlog" align="center">
+
+		<h2>WizFight Devlog</h2>
+
+		<a href="feed://wizfight.tumblr.com/rss"><img src="img/common/rss.svg" width="32" height="32" /></a>
+
+
+
+		<div id="blog">
+
+		</div>
+
+
+
+		<br />
+
+		<span class='clickable' id='older'>Older</span> <span class='clickable' id='newer'>Newer</span>
+
+	</div>
+
+</div>
+
+
+
+<div align="center" style="padding: 10px 0"><p style="font-family:Dretch; color:white;text-shadow:1px 1px 1px black;">Copyright Matt Chelen 2019 | <a href="mailto:mattchelen@gmail.com">Contact</a></p></div>
+
+
+
+</body>
+
+</html>
+
