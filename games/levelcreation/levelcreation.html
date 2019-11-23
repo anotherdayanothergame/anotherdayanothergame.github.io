@@ -1,0 +1,101 @@
+<p>In the future, I plan to have an integrated map editor but for now, I will explain how you currently add new levels to the game.</p>
+
+<h2>Setup</h2>
+
+<p>First, you will need both <a href="http://sourceforge.net/projects/tiled/">Tiled</a> and a text editor, preferably one like <a href="http://www.sublimetext.com/2">Sublime Text 2</a> or <a href="http://notepad-plus-plus.org/">Notepad++</a> that support XML syntax highlighting. You will also want to make sure that the game's folder is open, as all of the folders referenced will be relative to the folder that the game executable is in.</p>
+
+<p><i>If you are on a Mac, you will want to "Show Package Contents" and then go to "Contents/Resources"</i></p>
+
+<p>Next, make a tileset. Your tileset can be anything that you want it to be, so long as you use 16x16 tiles. When you're done, save the tileset as a .png file with the same name that you plan on your level having and place it in "gfx/tiles". For example, one of my levels is named "tower", so I would save the tileset as "tower.png" before placing it in "gfx/tiles".</p>
+
+<h2>Tiled Map</h2>
+
+<p>Now, open Tiled. Create a new map and use the following settings.</p>
+
+<img src="tiledsettings.png" />
+
+<p>Once you've done that, create two new layers and name the three layers you have, from top to bottom, "collision", "top", and "bottom". When you're done, the layers should look like the following.</p>
+
+<img src="tiledlayers.png" />
+
+<p>Now create your level. Here is what each layer is for:</p>
+
+<ul>
+	<li><b>Collision</b>: This is the collision map. For this layer, I generally grab a random tile, paint over whatever I plan on the player being able to collide with, and then turn its visibility on and off to make sure it's set up correctly.</li>
+	<li><b>Top</b>: This is the foreground layer. Generally, I place the graphics for any tiles that I intend on the player being able to collide with here.</li>
+	<li><b>Bottom</b>: This is the background layer. Generally, I use this for background graphics and for graphics for any tiles the player will not be able to collide with.</li>
+</ul>
+
+<p>To ensure that your level works as intended, I'd highly recommend that, at places that you place a tile the player can walk on at the edge of the screen, you also place a tile on the the other side that the player can walk on at the same height.</p>
+
+<p>Once you're done creating your level, save it, again, as the name of the level, and then place it in the folder "maps".</p>
+
+<h2>Music and Win Sounds</h2>
+
+<p>If you want custom music and/or win sounds for your level, you need to save them in .ogg format and place them both in "music", music with the name of your level and win sound with the name of your level, followed by "_win". For example, "tower_win.ogg".</p>
+
+<p>You are not required to have both at the same time. You can have one, the other, or neither, so long as you make sure to override the music to have some other music playing or else no music will play. Win sounds, on the other hand, default to a universal win sound so you are not required to create one or override it to have one play at the end of a match but you are required to override it if you want a custom win sound.</p>
+
+<h2>Level Config File</h2>
+
+<p>Next, open your text editor of choice and create a new file. If it supports syntax highlighting, set it to XML. For reference, I am going to place a completed level configuration file right here.</p>
+
+<script src="https://gist.github.com/johnki/8f4d0014e56c0d007784.js"></script>
+
+<p><i>Note: When the integrated map editor is added, all elements added here (other than where certain traps spawn) will be required to be placed directly on tiles, meaning x and y values will be required to be multiples of 16 (unless, like buttons, their height is 16), so I would recommend placing each element at x and y values that are multiples of 16.</i></p>
+
+<p>As you can see, we have the top level node "level" and several nodes inside it. No matter if there are any nodes inside them, you must always have opening and closing nodes for "spawns", "bounds", and "hills".</p>
+
+<p>The "spawns" node is for spawn points. They are all required to have the attributes "x" and "y", and will ignore any other attributes. You are required to have at least four spawn points (one for each player to start at).</p>
+
+<p>The "bounds" node is for boxes that are used to keep the player from falling through the tilemap at points that they wrap around the screen. At all heights that the player can wrap around the x axis, you need to place bounds at the x values -16 and 320. If you want the player to wrap around the y axis, and there are tiles the player can collide with at y values 224 AND 0 near the place where the player can wrap around the screen, you are required to place bounds at y values -16 and 240 or the player can get stuck in the tiles at 0. Below is an image to illustrate.</p>
+
+<img src="bounds.png" />
+
+<p>The "lavas" node (not in the sample file) is for lava. Lava takes the values "x", "y" and "width" and starts at x and y and places 4x4 segments every 4 pixels for the extent of the designated width.</p>
+
+<p>The "hills" node is for King of the Hill hills. Since the hills are only 10 pixels tall, you need to add 6 to your y value if you want them to sit on the tile correctly.</p>
+
+<p> The "traps" node is for traps. Since trap buttons are only 4 pixels tall, you need to add 12 to your y value if you want them to sit on the tile correctly. There are two types of trap, random and button-activated.</p>
+
+<p>Here is a list of all of the traps:</p>
+<ul>
+	<li><b>boulder</b> (button-activated): A boulder (of size 32x32 or 2 tiles x 2 tiles) that starts at its spawn point and rolls until it either falls off the bottom of the screen or gets trapped in a player-made area.</li>
+	<li><b>laser</b> (button-activated): A laser that goes from the trap's position until either the nearest point on the collision map or the edge of the screen.</li>
+	<li><b>puffer</b> (random): A random trap that spawns a puffer, at any part of the map that isn't in the collision map, that floats, in random directions, around the map until it either hits a player or goes off-screen.</li>
+	<li><b>spike</b> (button-activated): A stereotypical spike trap that kills anyone that touches it when the button is pressed.</li>
+</ul>
+
+<p>Random traps are required to have the following attributes:</p>
+
+<ul>
+	<li><b>delaymin</b>: The minimum amount of time (in seconds) allowed between activations of the random trap.</li>
+	<li><b>delaymax</b>: The maximum amount of time (in seconds) allowed between activations of the random trap.</li>
+</ul>
+
+<p>Button-activated traps are required to have the following attributes:</p>
+<ul>
+	<li><b>x</b>: The x position of the button.</li>
+	<li><b>y</b>: The y position of the button.</li>
+	<li><b>spawnx</b>: The x position of the trap (for boulders, this is the x position the boulder spawns at).</li>
+	<li><b>spawny</b>: The y position of the trap (for boulders, this is the y position the boulder spawns at).</li>
+	<li><b>delay</b>: The amount of time before the trap resets (for boulders, this timer starts after the boulder falls off the bottom of the screen).</li>
+	<li><b>dir</b>: The direction the trap is facing. For all button-activated traps except the boulder, 0 is down, 1 is up, 2 is right and 3 is left. For the boulder, 0 tells it to roll left, 1 tells it to roll right.</li>
+</ul>
+
+<p>The "overrides" node is for the player to override nodes and tile maps so that the game looks for something other than the default value (the map name). All overrides are required to have one attribute, "name", which is the name of the file that the game should look for instead of the default.</p>
+
+<p>The following overrides can be used:</p>
+<ul>
+	<li><b>tiles</b>: Overrides the tilemap.</li>
+	<li><b>music</b>: Overrides the music.</li>
+	<li><b>win</b>: Overrides the sound played when a player wins. As mentioned above, you are only required to override this if you want a custom one played. If you do override it, only use the level name for the "name" attribute. The game will automatically append "_win.ogg" to the end of the sound name when looking for it.</li>
+</ul>
+
+<p>When you are done creating your level, save it with the name of your level and the extension ".lvl", for example "tower.lvl", and place it in "maps".</p>
+
+<h2>Levels file</h2>
+
+<p>The last thing you have to do, to get the game to acknowledge the existence of the level, is to go into the folder "maps", open "levels.lvl" and add your level's name in a node to the end of the list in the file.</p>
+
+<p>Once you've done that, save levels.lvl, open the game, and your level should show up on the level selection screen at the end of the list.</p>
