@@ -29,7 +29,7 @@
 
 			<body style='background-color:#e0f0e8'>
 				<center>
-					<a href='http://anotherdayanotherga.me/games/srm2013/index.php'><img src='img/logo.png' /></a>
+					<a href='https://anotherdayanothergame.github.io/games/srm2013/index.php'><img src='img/logo.png' /></a>
 					<br />
 					<div id='content' class='content'>
 						<h1>Most money</h1>

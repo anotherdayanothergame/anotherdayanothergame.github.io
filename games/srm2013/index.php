@@ -41,7 +41,7 @@
 
 			<body style='background-color:#e0f0e8'>
 				<center>
-					<a href='http://anotherdayanotherga.me/games/srm2013/index.php'><img src='img/logo.png' /></a>
+					<a href='https://anotherdayanothergame.github.io/games/srm2013/index.php'><img src='img/logo.png' /></a>
 					<br />
 					<div id='content' class='content'>
 						<p>Download the game <a href='download.html'>here</a>.</p>
@@ -115,7 +115,7 @@
 							<input type='submit' value='Submit'>
 						</form>
 
-						<p>Game by <a href='http://anotherdayanotherga.me'>Another Day, Another Game</a> with music by <a href='https://soundcloud.com/jordanoakley-1'>Jordan Oakley</a>.</p>
+						<p>Game by <a href='https://anotherdayanothergame.github.io'>Another Day, Another Game</a> with music by <a href='https://soundcloud.com/jordanoakley-1'>Jordan Oakley</a>.</p>
 						<p>Made for <a href='http://gbjam.net'>GBJam 2013</a>.</p>
 						<p>Copyright Matt Chelen 2013.</p>
 					</div>
